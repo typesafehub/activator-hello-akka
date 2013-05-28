@@ -1,0 +1,470 @@
+<!-- <html> -->
+<head>
+    <title>Hello Akka Template</title>
+</head>
+
+<body>
+
+<div>
+    <p>You've just created a simple Akka application! Now lets explore the code and make some changes.</p>
+    <p>
+    In short, <a href="http://akka.io">Akka</a> is a toolkit and runtime for building highly concurrent,
+    distributed, and fault-tolerant event-driven applications on the JVM. Akka can be used with both Java
+    and Scala. One of the most powerful features of Akka is its <a href="http://en.wikipedia.org/wiki/Actor_model">
+    Actor Model</a> of concurrency, which you will learn more about in this tutorial.
+    </p>
+    <p>Akka can be used from either Java or Scala and this tutorial has both Java and Scala sample code.</p>
+
+    <h2>Source code</h2>
+
+    <p>
+    The <a href="#code/app" class="shortcut">app</a> directory contains both the Java and Scala
+    source code: <a href="#code/app/HelloAkkaJava.java" class="shortcut">HelloAkkaJava.java</a>
+    and <a href="#code/app/HelloAkkaScala.scala" class="shortcut">HelloAkkaScala.scala</a>.
+    </p>
+    <p>
+    The sample in this tutorial is pretty simple; it consists of a <code>Greeter</code> Actor who holds
+    onto the latest defined <code>greeting</code> string and can respond to two actions; set a new greeting
+    string and return the latest greeting string.
+    </p>
+    <p>
+    Next let's get started.
+    </p>
+</div>
+
+<div>
+    <h2>Define our Messages</h2>
+    <p>
+    An Actor does not have a public API in terms of methods that you can invoke. Instead its public
+    API is defined through messages that the actor handles. Messages can be of arbitrary
+    type (any subtype of <code>Object</code> in Java or <code>Any</code> in Scala).  This means that we
+    can send boxed primitive values (such as <code>String</code>, <code>Integer</code>,
+    <code>Boolean</code> etc.) as messages or plain data structures like arrays and
+    collection types. However, since the messages are the Actor's public API, you should define
+    messages with good names and rich semantic and domain specific meaning, even if it's just wrapping
+    your data type. This will make it easier to use, understand and debug actor-based systems.
+    </p>
+    <p>
+     Now we want to define three different messages;
+     <ul>
+      <li><code>WhoToGreet</code> redefines the new greeting</li>
+      <li><code>Greet</code> asks the Actor for latest greeting</li>
+      <li><code>Greeting</code> returns the latest greeting</li>
+    </ul>
+    </p>
+    <p>
+    Let's start by defining the messages in Java (we are putting them inside an outer <a href="#code/app/HelloAkkaJava.java"
+    class="shortcut">HelloAkkaJava</a> class,
+    containing our full sample). It is <b>very important</b> that the messages we create are immutable (meaning that
+    they cannot be changed), if not we run the risk of accidentally sharing state between two different Actors
+    which will violate the Actor Model. In this sample we will not use any remoting, but it is a good practice to
+    always mark your messages as <code>Serializable</code> since then you will not run in to any runtime issues if
+    you decide to scale out (on to multiple nodes) with Akka but forget to go back and reimplement your messages.
+        <pre><code>
+// Java code
+
+public static class Greet implements Serializable {}
+
+public static class WhoToGreet implements Serializable {
+    public final String who;
+    public WhoToGreet(String who) {
+        this.who = who;
+    }
+}
+
+public static class Greeting implements Serializable {
+    public final String message;
+    public Greeting(String message) {
+        this.message = message;
+    }
+}
+        </code></pre>
+    </p>
+    <p>
+    This is the way we would define the messages in Scala.  In Scala case classes and case objects makes
+    excellent messages since they are immutable and have support for pattern matching, something we will
+    take advantage of in the Actor when matching on the messages it has received. Another advantage case
+    classes has is that they are marked as serializable by default.
+        <pre><code>
+// Scala code
+
+case object Greet
+case class WhoToGreet(who: String)
+case class Greeting(message: String)
+        </code></pre>
+    </p>
+</div>
+
+<div>
+    <h2>Define our Actor</h2>
+
+    <p>
+    The Actor is the unit of execution in Akka.  Actors are object-oriented in the sense that they encapsulate
+    state and behavior, but they have much stronger isolation than regular objects in Java or Scala. The Actor
+    model prevents sharing state between Actors and the only way to observe another actor's state is by sending
+    it a message asking for it. Actors are extremely lightweight, they are only constrained by memory of which
+    they only consume only a few hundred bytes each &#8212; this means you can easily create millions of concurrent
+    Actors in a single application. Their strong isolation principles together with the event-driven model (that
+    we will talk about later on) and location transparency makes it easy to solve hard concurrency and scalability
+    problems in an intuitive way.
+    </p>
+    <p>
+    You create an Actor in Java by defining a class that extends <code>UntypedActor</code> and implement the
+    <code>onReceive</code> method (in Scala you have to extend <code>Actor</code> trait and implement the
+    <code>receive</code> method). It is in the <code>onReceive</code> method that you define the behavior; how
+    the Actor should react to the different messages it receives.  An Actor can have &#8212; and often has &#8212;
+    state.  Accessing or mutating the internal state of an Actor is fully thread safe since protected by the Actor model.
+    </p>
+    <p>
+    So, let's now create a <code>Greeter</code> Actor with a single variable <code>greeting</code> as its state, holding on to the latest
+    defined greeting, and in its <code>onReceive</code> method let's add the behavior for how it should react upon receiving
+    the <code>WhoToGreet</code> and the <code>Greet</code> messages.
+    </p>
+    <p>
+    Let's start by creating our Actor in Java (you can find the code in the <a href="#code/app/HelloAkkaJava.java"
+     class="shortcut">HelloAkkaJava.java</a> file):
+        <pre><code>
+// Java code
+
+public static class Greeter extends UntypedActor {
+    String greeting = "";
+
+    public void onReceive(Object message) {
+        if (message instanceof WhoToGreet)
+            greeting = "hello, " + ((WhoToGreet) message).who;
+
+        else if (message instanceof Greet)
+            getSender().tell(new Greeting(greeting), getSelf());
+
+        else unhandled(message);
+    }
+}
+        </code></pre>
+    </p>
+    <p>
+    Don't worry about the <code>getSender()</code>, <code>tell(..)</code> and <code>getSelf()</code> API calls,
+    we will get to that soon when we talk about sending and replying to messages.
+    </p>
+    <p>
+    Now let's implement it in Scala. As you can see, Scala's pattern matching features really simplify working
+    with Actors, but apart from that it's pretty similar to the Java version (you can find the code in the
+    <a href="#code/app/HelloAkkaScala.scala" class="shortcut">HelloAkkaScala.scala</a> file).
+        <pre><code>
+// Scala code
+
+class Greeter extends Actor {
+  var greeting = ""
+
+  def receive = {
+    case WhoToGreet(who) => greeting = s"hello, $who"
+    case Greet           => sender tell Greeting(greeting)
+  }
+}
+        </code></pre>
+    </p>
+</div>
+
+<div>
+    <h2>Create our Actor</h2>
+
+    <p>
+    So far we have defined our Actor and its messages. Now let's create an instance of this actor. In Akka you can't
+    create an instance of an Actor the regular way using <code>new</code> but you have to do so through a factory. What is
+    returned from this factory is not an instance of the Actor itself but an <code>ActorRef</code> pointing to our actor
+    instance.
+    </p>
+    <p>
+    This level of indirection adds a lot of power and flexibility. It enables for example location transparency
+    meaning that the <code>ActorRef</code> can, while retaining the same semantics, represent an instance of the running actor
+    in-process or on a remote machine. I.e. location doesn't matter. This also means that the runtime can if needed
+    optimize the system by changing an actor's location or the application's topology while it is running. Another
+    thing that this level of indirection enables is the "let it crash" model of failure management in which the
+    system can heal itself by crashing and restarting faulty actors.
+    </p>
+    <p>
+    This factory in Akka is the <code>ActorSystem</code> and is to some extent similar to Spring's <code>BeanFactory</code>
+    in that it also acts as a container for your Actors, managing their life-cycles etc.  You create an Actor through the
+    <code>actorOf</code> factory method. This method takes a configuration object called <code>Props</code> and a name.
+    Actor (and ActorSystem) names are important in Akka, you use them for example when looking Actors up as well as when you
+    configure them in the <a href="http://doc.akka.io/docs/akka/2.2-M3/general/configuration.html">configuration
+    file</a>, so you should take your time giving your Actors good names.
+    </p>
+    <p>
+    This is the code that we have to write in Java:
+        <pre><code>
+// Java code
+
+final ActorSystem system = ActorSystem.create("helloakka");
+final ActorRef greeter = system.actorOf(Props.create(Greeter.class), "greeter");
+        </code></pre>
+    </p>
+    <p>
+    The Scala code is not much different:
+        <pre><code>
+// Scala code
+
+val system = ActorSystem("helloakka")
+val greeter = system.actorOf(Props[Greeter], "greeter")
+          </code></pre>
+    </p>
+    <p>
+    Now we have a running instance of a <code>Greeter</code> actor. Next we will learn how to communicate with it.
+    </p>
+</div>
+
+<div>
+    <h2>Tell the Actor (to do something)</h2>
+
+    <p>
+    All communication with Actors is done through asynchronous message passing. This is what makes Actors
+    reactive and event driven. An Actor doesn't do anything unless it's been told to do something, and you
+    tell it to do something by sending the message. Sending a message asynchronously means that the sender
+    does not stick around waiting for the message to be processed by the recipient actor. Instead the Actor
+    hands the message off by putting it on the recipient's mailbox and is then free to do something more
+    important than waiting for the recipient to react on the message. The actor's mailbox is essentially a
+    message queue and has ordering semantics, this guarantees that the ordering of multiple messages sent
+    from the same Actor is preserved, while they can be interleaved with the messages sent by another actor.
+    </p>
+    <p>
+    You might be wondering what the Actor is doing when it is not processing messages, i.e. doing actual work?
+    It is in a suspended state in which it does not consume any resources apart from memory.
+    </p>
+    <p>
+    You tell an Actor to do something by passing in a message into the <code>tell</code> method on the
+    <code>ActorRef</code>. This method puts the message on the actor's mailbox and then returns immediately.
+    </p>
+    <p>
+        <pre><code>
+// Java code
+
+greeter.tell(new WhoToGreet("akka"));
+        </code></pre>
+    </p>
+    <p>
+        <pre><code>
+// Scala code
+
+greeter tell WhoToGreet("akka")
+        </code></pre>
+    </p>
+    <p>
+    If you are using Akka from Scala then you can also use the alias; <code>!</code>, called the bang operator,
+    but we will stick to <code>tell</code> in this tutorial.
+        <pre><code>
+// Scala code
+
+greeter ! WhoToGreet("akka")
+        </code></pre>
+    </p>
+</div>
+
+<div>
+    <h2>Replying to an Actor</h2>
+
+    <h3>The 'self' reference</h3>
+
+    <p>
+    Sometimes the the communication pattern is not just a one-way style of communication but instead lends
+    itself towards request-reply. One explicit way of doing that is by adding a reference of yourself as part
+    of the message so the receiver can use that reference to send a reply back to you. This is such a common
+    scenario that it is directly supported by Akka; for every message you send you have the option of passing
+    along the sender reference (the Actor's <code>ActorRef</code>).  If you are sending a message from within
+    an Actor then you have access to your own <code>ActorRef</code> through <code>self</code> reference, please
+    note that you should never use <code>this</code>. In Java you can access the self reference through the
+    <code>getSelf()</code> method, while you can use <code>self</code> in Scala.
+    </p>
+    <p>
+        <pre><code>
+// Java code
+
+// From within an Actor
+greeter.tell(new Greet(), getSelf());
+        </code></pre>
+    </p>
+    <p>
+    In Scala this is simplified a bit. Scala has something called
+    <a href="http://www.scala-lang.org/node/114">implicit parameters</a> which allows you to automatically and
+    transparently pass in parameters into methods, a feature that are taking advantage of here to automatically
+    pass along the sender reference when you send a message to another Actor.
+    </p>
+    <p>
+    This code will, if invoked from within Actor 'A' automatically pass along the <code>ActorRef</code> of
+    Actor 'A' as the sender of this message:
+        <pre><code>
+// Scala code
+
+// From within an Actor
+greeter tell Greet
+        </code></pre>
+    </p>
+    <p>
+    If you choose not to pass in a sender reference into the <code>tell</code> method, or forget it, then a reference to
+    the 'dead-letter' Actor will be used. The 'dead-letter' Actor is where all unhandled messages end up, and
+    you can use Akka's <a href="http://doc.akka.io/docs/akka/2.2-M3/java/event-bus.html">Event Bus</a> to subscribe on them.
+    </p>
+
+    <h3>The 'sender' reference</h3>
+
+    <p>
+    This sender reference will then be available in the receiver Actor when it's processing the message. Since
+    each message is paired with its unique sender reference, the "current" sender reference will change with each
+    new message you process. So if you for some reason need to use a specific sender reference later then you have
+    to hold on to it, storing it away in a member field or similar. In Java you can access it using the
+    <code>getSender()</code> method (while you can use <code>sender</code> in Scala).
+    </p>
+    <p>
+        <pre><code>
+// Java code
+
+// From within the Greeter Actor
+getSender().tell(new Greeting(greeting), getSelf());
+        </code></pre>
+    </p>
+    <p>
+        <pre><code>
+// Scala code
+
+// From within the Greeter Actor
+sender tell Greeting(greeting)
+        </code></pre>
+    </p>
+</div>
+
+<div>
+    <h2>Using Inbox</h2>
+
+    <p>
+    Most real-world Actor applications make use of more than one Actor. The inventor of the Actor Model,
+    Carl Hewitt, recently said in an interview that; "One Actor is no Actor. Actors come in systems."
+    This is important wisdom. To truly leverage the Actor Model you should use lots of Actors. Every hard
+    problem in Actor programming can be solved by adding more Actors; by breaking down the problem into
+    subtasks and delegate by handing them to new Actors.
+    </p>
+    <p>
+    However, for simplicity we are just using a single Actor in this sample. This means that if we communicate
+    with this single actor from a <code>main</code> program then we have no <code>sender</code>, since we are
+    not communicating with the Actor that within another Actor. Luckily Akka has a nice solution to this problem;
+    <code>Inbox</code>.
+    </p>
+    <p>
+    <code>Inbox</code> allows you to create an "actor-in-a-box", i.e. it contains an Actor which can be used as a puppet
+    for sending messages to other Actors and receiving their replies. You can create an <code>Inbox</code> using
+    <code>Inbox.create</code> and send messages from it using <code>inbox.send</code>. The internal Actor will just
+    put any message it receives into a queue from which it can be retrieved by calling <code>inbox.receive</code>;
+    if the queue is empty then that call will block until a message becomes available. Pretty simple.
+    </p>
+    <p>
+    As you probably know, blocking is something that can really inhibit performance and scalability, and that
+    you should use very sparingly and with care. That said, we are making use of it in this sample since it
+    simplifies the sample and makes it very easy to follow the message flow.
+    </p>
+    <p>
+    Now let's complete this tutorial by writing the driver code that will exercise our <code>Greeter</code> Actor.
+    </p>
+    <p>
+        <pre><code>
+// Java code
+
+// Create an "actor-in-a-box"
+final Inbox inbox = Inbox.create(system);
+
+// Tell the 'greeter' to change its 'greeting' message
+greeter.tell(new WhoToGreet("akka"));
+
+// Ask the 'greeter for the latest 'greeting'
+// Reply should go to the mailbox
+inbox.send(greeter, new Greet());
+
+// Wait 5 seconds for the reply with the 'greeting' message
+Greeting greeting = (Greeting) inbox.receive(Duration.create(5, "seconds"));
+System.out.println("Greeting: " + greeting.message);
+        </code></pre>
+    </p>
+    <p>
+        <pre><code>
+// Scala code
+
+// Create an "actor-in-a-box"
+val inbox = Inbox.create(system)
+
+// Tell the 'greeter' to change its 'greeting' message
+greeter tell WhoToGreet("akka")
+
+// Ask the 'greeter for the latest 'greeting'
+// Reply should go to the mailbox
+inbox.send(greeter, Greet)
+
+// Wait 5 seconds for the reply with the 'greeting' message
+val Greeting(message) = inbox.receive(5.seconds)
+println(s"Greeting: $message")
+        </code></pre>
+    </p>
+</div>
+
+<div>
+    <h2>Run the App</h2>
+
+    <p>
+     Congratulations!!!
+    </p>
+    <p>
+     Now you have almost completed the tutorial and written a simple Akka application. If you have not looked
+     at the full sample then now is a good time to do so.
+    <ul>
+      <li>Java version: <a href="#code/app/HelloAkkaJava.java" class="shortcut">HelloAkkaJava.java</a></li>
+      <li>Scala version: <a href="#code/app/HelloAkkaScala.scala" class="shortcut">HelloAkkaScala.scala</a></li>
+    </ul>
+    </p>
+    <p>
+    Let's have some fun and run it.
+    </p>
+    <p>
+    In <a href="#run" class="shortcut">Run</a>, select the application to run from the drop-down list, and select
+    <strong>Start</strong>. Feel free to modify, compile and re-run the sample.
+    </p>
+</div>
+
+<div>
+    <h2>Test the App</h2>
+
+    <p>
+    Both the Java and Scala examples each have unit tests in the <a href="#code/test" class="shortcut">test</a>
+    directory.  The <a href="#code/test/HelloAkkaTest.java" class="shortcut">Java tests</a> use JUnit, while
+    the <a href="#code/test/HelloAkkaSpec.scala" class="shortcut">Scala tests</a> use ScalaTest.
+    </p>
+    <p>
+    Both of these tests are making use of the excellent Akka
+    <a href="http://doc.akka.io/docs/akka/2.2-M3/scala/testing.html" target="_blank">TestKit</a> module,
+    which makes it so much easier to test and verify concurrent code.
+    </p>
+    <p>
+    Making changes to the sample's source or the test source will cause the tests to be automatically re-run.
+    </p>
+</div>
+
+<div>
+    <h2>Next Steps</h2>
+
+    <p>
+    The <a href="http://akka.io/docs/" target="_blank">Akka Documentation</a> explains each one of the topics covered
+    in this tutorial in great depth, and much much more.
+    </p>
+    <p>
+    The manual is split up into Java and Scala versions.
+    <ul>
+      <li><a href="http://doc.akka.io/docs/akka/2.2-M3/java.html" target="_blank">Java Manual</a></li>
+      <li><a href="http://doc.akka.io/docs/akka/2.2-M3/scala.html" target="_blank">Scala Manual</a></li>
+    </ul>
+    </p>
+    <p>
+    The Akka Team blog; <a href="http://letitcrash.com" target="_blank">Let It Crash</a> has a lot of articles and
+    can be a good additional source of information.<br/>
+    </p>
+    <p>
+    If you have questions don't hesitate to post them to the
+    <a href="http://groups.google.com/group/akka-user" target="_blank">akka-user</a> Google Group.<br/>
+    </p>
+</div>
+
+</body>
+</html>

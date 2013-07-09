@@ -1,4 +1,4 @@
-import akka.actor.{ ActorSystem, Props, Actor, Inbox }
+import akka.actor.{ ActorRef, ActorSystem, Props, Actor, Inbox }
 import scala.concurrent.duration._
 
 case object Greet

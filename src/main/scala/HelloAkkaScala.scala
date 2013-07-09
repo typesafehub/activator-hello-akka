@@ -1,4 +1,4 @@
-import akka.actor.{ActorSystem, Props, Actor, Inbox}
+import akka.actor.{ ActorSystem, Props, Actor, Inbox }
 import scala.concurrent.duration._
 
 case object Greet
@@ -10,7 +10,7 @@ class Greeter extends Actor {
 
   def receive = {
     case WhoToGreet(who) => greeting = s"hello, $who"
-    case Greet           => sender tell Greeting(greeting) // Send the current greeting back to the sender
+    case Greet           => sender ! Greeting(greeting) // Send the current greeting back to the sender
   }
 }
 
@@ -26,7 +26,7 @@ object HelloAkkaScala extends App {
   val inbox = Inbox.create(system)
 
   // Tell the 'greeter' to change its 'greeting' message
-  greeter tell WhoToGreet("akka")
+  greeter.tell(WhoToGreet("akka"), ActorRef.noSender)
 
   // Ask the 'greeter for the latest 'greeting'
   // Reply should go to the "actor-in-a-box"
@@ -37,7 +37,7 @@ object HelloAkkaScala extends App {
   println(s"Greeting: $message1")
 
   // Change the greeting and ask for it again
-  greeter tell WhoToGreet("typesafe")
+  greeter.tell(WhoToGreet("typesafe"), ActorRef.noSender)
   inbox.send(greeter, Greet)
   val Greeting(message2) = inbox.receive(5.seconds)
   println(s"Greeting: $message2")

@@ -18,9 +18,10 @@
     <h2>Source code</h2>
 
     <p>
-    The <a href="#code/app" class="shortcut">app</a> directory contains both the Java and Scala
-    source code: <a href="#code/app/HelloAkkaJava.java" class="shortcut">HelloAkkaJava.java</a>
-    and <a href="#code/app/HelloAkkaScala.scala" class="shortcut">HelloAkkaScala.scala</a>.
+    The <a href="#code/src/main/java" class="shortcut">java</a> directory contains the Java
+    source code <a href="#code/src/main/java/HelloAkkaJava.java" class="shortcut">HelloAkkaJava.java</a>
+    and the <a href="#code/src/main/scala" class="shortcut">scala</a> directory contains the Scala
+    source code <a href="#code/src/main/scala/HelloAkkaScala.scala" class="shortcut">HelloAkkaScala.scala</a>.
     </p>
     <p>
     The sample in this tutorial is pretty simple; it consists of a <code>Greeter</code> Actor who holds
@@ -53,7 +54,7 @@
     </ul>
     </p>
     <p>
-    Let's start by defining the messages in Java (we are putting them inside an outer <a href="#code/app/HelloAkkaJava.java"
+    Let's start by defining the messages in Java (we are putting them inside an outer <a href="#code/src/main/java/HelloAkkaJava.java"
     class="shortcut">HelloAkkaJava</a> class,
     containing our full sample). It is <b>very important</b> that the messages we create are immutable (meaning that
     they cannot be changed), if not we run the risk of accidentally sharing state between two different Actors
@@ -121,7 +122,7 @@ case class Greeting(message: String)
     the <code>WhoToGreet</code> and the <code>Greet</code> messages.
     </p>
     <p>
-    Let's start by creating our Actor in Java (you can find the code in the <a href="#code/app/HelloAkkaJava.java"
+    Let's start by creating our Actor in Java (you can find the code in the <a href="#code/src/main/java/HelloAkkaJava.java"
      class="shortcut">HelloAkkaJava.java</a> file):
         <pre><code>
 // Java code
@@ -148,7 +149,7 @@ public static class Greeter extends UntypedActor {
     <p>
     Now let's implement it in Scala. As you can see, Scala's pattern matching features really simplify working
     with Actors, but apart from that it's pretty similar to the Java version (you can find the code in the
-    <a href="#code/app/HelloAkkaScala.scala" class="shortcut">HelloAkkaScala.scala</a> file).
+    <a href="#code/src/main/scala/HelloAkkaScala.scala" class="shortcut">HelloAkkaScala.scala</a> file).
         <pre><code>
 // Scala code
 
@@ -157,7 +158,7 @@ class Greeter extends Actor {
 
   def receive = {
     case WhoToGreet(who) => greeting = s"hello, $who"
-    case Greet           => sender tell Greeting(greeting)
+    case Greet           => sender ! Greeting(greeting)
   }
 }
         </code></pre>
@@ -186,7 +187,7 @@ class Greeter extends Actor {
     in that it also acts as a container for your Actors, managing their life-cycles etc.  You create an Actor through the
     <code>actorOf</code> factory method. This method takes a configuration object called <code>Props</code> and a name.
     Actor (and ActorSystem) names are important in Akka, you use them for example when looking Actors up as well as when you
-    configure them in the <a href="http://doc.akka.io/docs/akka/2.2-M3/general/configuration.html">configuration
+    configure them in the <a href="http://doc.akka.io/docs/akka/2.2.0/general/configuration.html">configuration
     file</a>, so you should take your time giving your Actors good names.
     </p>
     <p>
@@ -237,19 +238,18 @@ val greeter = system.actorOf(Props[Greeter], "greeter")
         <pre><code>
 // Java code
 
-greeter.tell(new WhoToGreet("akka"));
+greeter.tell(new WhoToGreet("akka"), ActorRef.noSender());
         </code></pre>
     </p>
     <p>
         <pre><code>
 // Scala code
 
-greeter tell WhoToGreet("akka")
+greeter.tell(WhoToGreet("akka"), ActorRef.noSender)
         </code></pre>
     </p>
     <p>
-    If you are using Akka from Scala then you can also use the alias; <code>!</code>, called the bang operator,
-    but we will stick to <code>tell</code> in this tutorial.
+    If you are using Akka from Scala then you can also use the alias; <code>!</code>, called the bang operator.
         <pre><code>
 // Scala code
 
@@ -294,13 +294,13 @@ greeter.tell(new Greet(), getSelf());
 // Scala code
 
 // From within an Actor
-greeter tell Greet
+greeter ! Greet
         </code></pre>
     </p>
     <p>
     If you choose not to pass in a sender reference into the <code>tell</code> method, or forget it, then a reference to
     the 'dead-letter' Actor will be used. The 'dead-letter' Actor is where all unhandled messages end up, and
-    you can use Akka's <a href="http://doc.akka.io/docs/akka/2.2-M3/java/event-bus.html">Event Bus</a> to subscribe on them.
+    you can use Akka's <a href="http://doc.akka.io/docs/akka/2.2.0/java/event-bus.html">Event Bus</a> to subscribe on them.
     </p>
 
     <h3>The 'sender' reference</h3>
@@ -325,7 +325,7 @@ getSender().tell(new Greeting(greeting), getSelf());
 // Scala code
 
 // From within the Greeter Actor
-sender tell Greeting(greeting)
+sender ! Greeting(greeting)
         </code></pre>
     </p>
 </div>
@@ -411,8 +411,8 @@ println(s"Greeting: $message")
      Now you have almost completed the tutorial and written a simple Akka application. If you have not looked
      at the full sample then now is a good time to do so.
     <ul>
-      <li>Java version: <a href="#code/app/HelloAkkaJava.java" class="shortcut">HelloAkkaJava.java</a></li>
-      <li>Scala version: <a href="#code/app/HelloAkkaScala.scala" class="shortcut">HelloAkkaScala.scala</a></li>
+      <li>Java version: <a href="#code/src/main/java/HelloAkkaJava.java" class="shortcut">HelloAkkaJava.java</a></li>
+      <li>Scala version: <a href="#code/src/main/scala/HelloAkkaScala.scala" class="shortcut">HelloAkkaScala.scala</a></li>
     </ul>
     </p>
     <p>
@@ -428,13 +428,13 @@ println(s"Greeting: $message")
     <h2>Test the App</h2>
 
     <p>
-    Both the Java and Scala examples each have unit tests in the <a href="#code/test" class="shortcut">test</a>
-    directory.  The <a href="#code/test/HelloAkkaTest.java" class="shortcut">Java tests</a> use JUnit, while
-    the <a href="#code/test/HelloAkkaSpec.scala" class="shortcut">Scala tests</a> use ScalaTest.
+    Both the Java and Scala examples each have unit tests in the <a href="#code/src/test" class="shortcut">test</a>
+    directory.  The <a href="#code/src/test/java/HelloAkkaTest.java" class="shortcut">Java tests</a> use JUnit, while
+    the <a href="#code/src/test/scala/HelloAkkaSpec.scala" class="shortcut">Scala tests</a> use ScalaTest.
     </p>
     <p>
     Both of these tests are making use of the excellent Akka
-    <a href="http://doc.akka.io/docs/akka/2.2-M3/scala/testing.html" target="_blank">TestKit</a> module,
+    <a href="http://doc.akka.io/docs/akka/2.2.0/scala/testing.html" target="_blank">TestKit</a> module,
     which makes it so much easier to test and verify concurrent code.
     </p>
     <p>
@@ -452,8 +452,8 @@ println(s"Greeting: $message")
     <p>
     The manual is split up into Java and Scala versions.
     <ul>
-      <li><a href="http://doc.akka.io/docs/akka/2.2-M3/java.html" target="_blank">Java Manual</a></li>
-      <li><a href="http://doc.akka.io/docs/akka/2.2-M3/scala.html" target="_blank">Scala Manual</a></li>
+      <li><a href="http://doc.akka.io/docs/akka/2.2.0/java.html" target="_blank">Java Manual</a></li>
+      <li><a href="http://doc.akka.io/docs/akka/2.2.0/scala.html" target="_blank">Scala Manual</a></li>
     </ul>
     </p>
     <p>

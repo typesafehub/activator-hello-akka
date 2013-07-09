@@ -48,7 +48,7 @@ public class HelloAkkaJava {
         final Inbox inbox = Inbox.create(system);
 
         // Tell the 'greeter' to change its 'greeting' message
-        greeter.tell(new WhoToGreet("akka"));
+        greeter.tell(new WhoToGreet("akka"), ActorRef.noSender());
 
         // Ask the 'greeter for the latest 'greeting'
         // Reply should go to the "actor-in-a-box"
@@ -59,7 +59,7 @@ public class HelloAkkaJava {
         System.out.println("Greeting: " + greeting1.message);
 
         // Change the greeting and ask for it again
-        greeter.tell(new WhoToGreet("typesafe"));
+        greeter.tell(new WhoToGreet("typesafe"), ActorRef.noSender());
         inbox.send(greeter, new Greet());
         Greeting greeting2 = (Greeting) inbox.receive(Duration.create(5, TimeUnit.SECONDS));
         System.out.println("Greeting: " + greeting2.message);

@@ -4,7 +4,7 @@ version := "1.0"
 
 scalaVersion := "2.10.2"
 
-mainClass in (Compile, run) := Some("HelloKernel")
+mainClass in Compile := Some("HelloKernel")
 
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor" % "2.2.1",

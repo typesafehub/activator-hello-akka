@@ -18,10 +18,10 @@
     <h2>Source code</h2>
 
     <p>
-    The <a href="#code/src/main/java" class="shortcut">src/main/java</a> directory contains the Java
+    The <a href="#code/src/main/java" class="shortcut">java</a> directory contains the Java
     source code <a href="#code/src/main/java/HelloAkkaJava.java" class="shortcut">HelloAkkaJava.java</a>
-    and the <a href="#code/src/main/scala" class="shortcut">src/main/scala</a> directory contains the Scala
-    source code <a href="#code/src/main/scala/HelloAkkaScala.scala" class="shortcut">HelloAkkaScala.scala</a> and <a href="#code/src/main/scala/HelloKernel.scala" class="shortcut">HelloKernel.scala</a>.
+    and the <a href="#code/src/main/scala" class="shortcut">scala</a> directory contains the Scala
+    source code <a href="#code/src/main/scala/HelloAkkaScala.scala" class="shortcut">HelloAkkaScala.scala</a>.
     </p>
     <p>
     The sample in this tutorial is pretty simple; it consists of a <code>Greeter</code> Actor who holds
@@ -401,49 +401,46 @@ println(s"Greeting: $message")
     </p>
 </div>
 
+<div>
+    <h2>Run the App</h2>
+
+    <p>
+     Congratulations!!!
+    </p>
+    <p>
+     Now you have almost completed the tutorial and written a simple Akka application. If you have not looked
+     at the full sample then now is a good time to do so.
+    <ul>
+      <li>Java version: <a href="#code/src/main/java/HelloAkkaJava.java" class="shortcut">HelloAkkaJava.java</a></li>
+      <li>Scala version: <a href="#code/src/main/scala/HelloAkkaScala.scala" class="shortcut">HelloAkkaScala.scala</a></li>
+    </ul>
+    </p>
+    <p>
+    Let's have some fun and run it.
+    </p>
+    <p>
+    In <a href="#run" class="shortcut">Run</a>, select the application to run from the drop-down list, and select
+    <strong>Start</strong>. Feel free to modify, compile and re-run the sample.
+    </p>
+</div>
 
 <div>
     <h2>Test the App</h2>
 
     <p>
-        Both the Java and Scala examples each have unit tests in the <a href="#code/src/test" class="shortcut">test</a>
-        directory.  The <a href="#code/src/test/java/HelloAkkaTest.java" class="shortcut">Java tests</a> use JUnit, while
-        the <a href="#code/src/test/scala/HelloAkkaSpec.scala" class="shortcut">Scala tests</a> use ScalaTest.
+    Both the Java and Scala examples each have unit tests in the <a href="#code/src/test" class="shortcut">test</a>
+    directory.  The <a href="#code/src/test/java/HelloAkkaTest.java" class="shortcut">Java tests</a> use JUnit, while
+    the <a href="#code/src/test/scala/HelloAkkaSpec.scala" class="shortcut">Scala tests</a> use ScalaTest.
     </p>
     <p>
-        Both of these tests are making use of the excellent Akka
-        <a href="http://doc.akka.io/docs/akka/2.2.0/scala/testing.html" target="_blank">TestKit</a> module,
-        which makes it so much easier to test and verify concurrent code.
+    Both of these tests are making use of the excellent Akka
+    <a href="http://doc.akka.io/docs/akka/2.2.0/scala/testing.html" target="_blank">TestKit</a> module,
+    which makes it so much easier to test and verify concurrent code.
     </p>
     <p>
-        Making changes to the sample's source or the test source will cause the tests to be automatically re-run.
+    Making changes to the sample's source or the test source will cause the tests to be automatically re-run.
     </p>
 </div>
-
-<div>
-    <h2>Run the App</h2>
-
-    <p>
-        You are ready to see Akka in action by running the sample apps. Three different runnable applications are available to run this sample:
-        <ul>
-          <li>Java app that runs and then exits: <a href="#code/src/main/java/HelloAkkaJava.java" class="shortcut">HelloAkkaJava.java</a></li>
-          <li>Scala app that runs and then exits: <a href="#code/src/main/scala/HelloAkkaScala.scala" class="shortcut">HelloAkkaScala.scala</a></li>
-          <li>Scala app that runs until stopped (server): <a href="#code/src/main/scala/HelloKernel.scala" class="shortcut">HelloKernel.scala</a></li>
-        </ul>
-        In <a href="#run" class="shortcut">Run</a>, the <strong>HelloKernel</strong> app should already be running.  You should see a "hello, kernel" message repeatedly displayed in the output window.  To run either of the other apps, select them in the drop-down and click the <strong>Restart</strong> button.
-    </p>
-</div>
-
-<!-- todo -->
-<!--
-<div>
-    <h2>Typesafe Console</h2>
-
-    <p>
-        
-    </p>
-</div>
--->
 
 <div>
     <h2>Next Steps</h2>

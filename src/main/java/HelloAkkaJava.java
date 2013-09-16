@@ -4,6 +4,8 @@ import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.actor.Inbox;
 import scala.concurrent.duration.Duration;
+import scala.concurrent.duration.FiniteDuration;
+
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
@@ -64,6 +66,14 @@ public class HelloAkkaJava {
         Greeting greeting2 = (Greeting) inbox.receive(Duration.create(5, TimeUnit.SECONDS));
         System.out.println("Greeting: " + greeting2.message);
 
-        system.shutdown();
+        // after zero seconds, send a Greet message every second to the greeter with a sender of the GreetPrinter
+        system.scheduler().schedule(Duration.Zero(), Duration.create(1, TimeUnit.SECONDS), greeter, new Greet(), system.dispatcher(), system.actorOf(Props.create(GreetPrinter.class)));
+    }
+
+    public static class GreetPrinter extends UntypedActor {
+        public void onReceive(Object message) {
+            if (message instanceof Greeting)
+                System.out.println(((Greeting) message).message);
+        }
     }
 }

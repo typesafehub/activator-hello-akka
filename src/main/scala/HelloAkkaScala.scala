@@ -42,5 +42,14 @@ object HelloAkkaScala extends App {
   val Greeting(message2) = inbox.receive(5.seconds)
   println(s"Greeting: $message2")
 
-  system.shutdown()
+  // after zero seconds, send a Greet message every second to the greeter with a sender of the greetPrinter
+  system.scheduler.schedule(0.seconds, 1.second, greeter, Greet)(system.dispatcher, system.actorOf(Props[GreetPrinter]))
+  
+}
+
+// prints a greeting
+class GreetPrinter extends Actor {
+  def receive = {
+    case Greeting(message) => println(message)
+  }
 }

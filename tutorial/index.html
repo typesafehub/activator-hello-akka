@@ -82,7 +82,7 @@ public static class Greeting implements Serializable {
         </code></pre>
     </p>
     <p>
-    This is the way we would define the messages in Scala.  In Scala case classes and case objects makes
+    This is the way we would define the messages in Scala.  In Scala case classes and case objects make
     excellent messages since they are immutable and have support for pattern matching, something we will
     take advantage of in the Actor when matching on the messages it has received. Another advantage case
     classes has is that they are marked as serializable by default.
@@ -104,7 +104,7 @@ case class Greeting(message: String)
     state and behavior, but they have much stronger isolation than regular objects in Java or Scala. The Actor
     model prevents sharing state between Actors and the only way to observe another actor's state is by sending
     it a message asking for it. Actors are extremely lightweight, they are only constrained by memory of which
-    they only consume only a few hundred bytes each &#8212; this means you can easily create millions of concurrent
+    they consume only a few hundred bytes each &#8212; this means you can easily create millions of concurrent
     Actors in a single application. Their strong isolation principles together with the event-driven model (that
     we will talk about later on) and location transparency makes it easy to solve hard concurrency and scalability
     problems in an intuitive way.
@@ -170,7 +170,7 @@ class Greeter extends Actor {
 
     <p>
     So far we have defined our Actor and its messages. Now let's create an instance of this actor. In Akka you can't
-    create an instance of an Actor the regular way using <code>new</code> but you have to do so through a factory. What is
+    create an instance of an Actor the regular way using <code>new</code>, instead you create it using a factory. What is
     returned from this factory is not an instance of the Actor itself but an <code>ActorRef</code> pointing to our actor
     instance.
     </p>
@@ -343,7 +343,7 @@ sender ! Greeting(greeting)
     <p>
     However, for simplicity we are just using a single Actor in this sample. This means that if we communicate
     with this single actor from a <code>main</code> program then we have no <code>sender</code>, since we are
-    not communicating with the Actor that within another Actor. Luckily Akka has a nice solution to this problem;
+    not communicating with the Actor from within another Actor. Luckily Akka has a nice solution to this problem;
     <code>Inbox</code>.
     </p>
     <p>

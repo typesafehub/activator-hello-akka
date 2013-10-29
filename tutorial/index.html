@@ -163,6 +163,16 @@ class Greeter extends Actor {
 }
         </code></pre>
     </p>
+    <p>
+    You will notice one difference to the Java version: here we do not
+    explicitly pass unhandled messages to the <code>unhandled()</code> method.
+    This is not necessary since the behavior defined by the
+    <code>receive</code> method is expressed as a so-called <em>partial
+      function</em>, which means that all messages for which no matching
+    <code>case</code> statement is written down will be recognized as being not
+    handled and Akka will automatically pass them to the
+    <code>unhandled()</code> method for you.
+    </p>
 </div>
 
 <div>

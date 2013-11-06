@@ -143,6 +143,11 @@ public static class Greeter extends UntypedActor {
         </code></pre>
     </p>
     <p>
+    Actors like this one are “untyped” in the sense that the type of message received is not restricted—it is 
+    <code>Object</code> as shown above. There are also typed actors, but we will 
+    not concern ourselves with those now, the normal actors are the untyped ones.
+    </p>
+    <p>
     Don't worry about the <code>getSender()</code>, <code>tell(..)</code> and <code>getSelf()</code> API calls,
     we will get to that soon when we talk about sending and replying to messages.
     </p>
@@ -172,6 +177,11 @@ class Greeter extends Actor {
     <code>case</code> statement is written down will be recognized as being not
     handled and Akka will automatically pass them to the
     <code>unhandled()</code> method for you.
+    </p>
+    <p>
+    Another difference is that the trait from which the Scala actor inherits is just called
+    <code>Actor</code>. This is the Scala API while <code>UntypedActor</code> is the Java API
+    for the same kind of actor.
     </p>
 </div>
 

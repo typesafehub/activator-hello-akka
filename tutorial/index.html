@@ -389,7 +389,7 @@ sender ! Greeting(greeting)
 final Inbox inbox = Inbox.create(system);
 
 // Tell the 'greeter' to change its 'greeting' message
-greeter.tell(new WhoToGreet("akka"));
+greeter.tell(new WhoToGreet("akka"), ActorRef.noSender());
 
 // Ask the 'greeter for the latest 'greeting'
 // Reply should go to the mailbox

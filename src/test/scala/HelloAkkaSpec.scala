@@ -1,6 +1,4 @@
-import org.scalatest.{ BeforeAndAfterAll, FlatSpec }
-import org.scalatest.concurrent._
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.{ BeforeAndAfterAll, FlatSpecLike, Matchers }
 import akka.actor.{ Actor, Props, ActorSystem }
 import akka.testkit.{ ImplicitSender, TestKit, TestActorRef }
 import scala.concurrent.duration._
@@ -8,8 +6,8 @@ import scala.concurrent.duration._
 class HelloAkkaSpec(_system: ActorSystem)
   extends TestKit(_system)
   with ImplicitSender
-  with ShouldMatchers
-  with FlatSpec
+  with Matchers
+  with FlatSpecLike
   with BeforeAndAfterAll {
 
   def this() = this(ActorSystem("HelloAkkaSpec"))

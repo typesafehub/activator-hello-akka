@@ -207,7 +207,7 @@ class Greeter extends Actor {
     in that it also acts as a container for your Actors, managing their life-cycles etc.  You create an Actor through the
     <code>actorOf</code> factory method. This method takes a configuration object called <code>Props</code> and a name.
     Actor (and ActorSystem) names are important in Akka, you use them for example when looking Actors up as well as when you
-    configure them in the <a href="http://doc.akka.io/docs/akka/2.2.0/general/configuration.html">configuration
+    configure them in the <a href="http://doc.akka.io/docs/akka/2.3.0/general/configuration.html">configuration
     file</a>, so you should take your time giving your Actors good names.
     </p>
     <p>
@@ -320,7 +320,7 @@ greeter ! Greet
     <p>
     If you choose not to pass in a sender reference into the <code>tell</code> method, or forget it, then a reference to
     the 'dead-letter' Actor will be used. The 'dead-letter' Actor is where all unhandled messages end up, and
-    you can use Akka's <a href="http://doc.akka.io/docs/akka/2.2.0/java/event-bus.html">Event Bus</a> to subscribe on them.
+    you can use Akka's <a href="http://doc.akka.io/docs/akka/2.3.0/java/event-bus.html">Event Bus</a> to subscribe on them.
     </p>
 
     <h3>The 'sender' reference</h3>
@@ -431,7 +431,7 @@ println(s"Greeting: $message")
     </p>
     <p>
     Both of these tests are making use of the excellent Akka
-    <a href="http://doc.akka.io/docs/akka/2.2.0/scala/testing.html" target="_blank">TestKit</a> module,
+    <a href="http://doc.akka.io/docs/akka/2.3.0/scala/testing.html" target="_blank">TestKit</a> module,
     which makes it so much easier to test and verify concurrent code.
     </p>
     <p>
@@ -481,8 +481,8 @@ println(s"Greeting: $message")
     <p>
     The manual is split up into Java and Scala versions.
     <ul>
-      <li><a href="http://doc.akka.io/docs/akka/2.2.1/java.html" target="_blank">Java Manual</a></li>
-      <li><a href="http://doc.akka.io/docs/akka/2.2.1/scala.html" target="_blank">Scala Manual</a></li>
+      <li><a href="http://doc.akka.io/docs/akka/2.3.0/java.html" target="_blank">Java Manual</a></li>
+      <li><a href="http://doc.akka.io/docs/akka/2.3.0/scala.html" target="_blank">Scala Manual</a></li>
     </ul>
     </p>
     <p>

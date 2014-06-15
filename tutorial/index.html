@@ -284,7 +284,7 @@ greeter ! WhoToGreet("akka")
     <h3>The 'self' reference</h3>
 
     <p>
-    Sometimes the the communication pattern is not just a one-way style of communication but instead lends
+    Sometimes the communication pattern is not just a one-way style of communication but instead lends
     itself towards request-reply. One explicit way of doing that is by adding a reference of yourself as part
     of the message so the receiver can use that reference to send a reply back to you. This is such a common
     scenario that it is directly supported by Akka; for every message you send you have the option of passing

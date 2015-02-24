@@ -1,6 +1,6 @@
 name := "hello-akka"
 
-version := "15v01p01"
+version := "15v01p02"
 
 libraryDependencies ++= Seq(
   TypesafeLibrary.akkaActor.value,

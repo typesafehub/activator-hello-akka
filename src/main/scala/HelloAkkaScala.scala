@@ -37,7 +37,7 @@ object HelloAkkaScala extends App {
   println(s"Greeting: $message1")
 
   // Change the greeting and ask for it again
-  greeter.tell(WhoToGreet("typesafe"), ActorRef.noSender)
+  greeter.tell(WhoToGreet("lightbend"), ActorRef.noSender)
   inbox.send(greeter, Greet)
   val Greeting(message2) = inbox.receive(5.seconds)
   println(s"Greeting: $message2")

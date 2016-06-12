@@ -63,7 +63,7 @@ public class HelloAkkaJava {
             System.out.println("Greeting: " + greeting1.message);
 
             // Change the greeting and ask for it again
-            greeter.tell(new WhoToGreet("typesafe"), ActorRef.noSender());
+            greeter.tell(new WhoToGreet("lightbend"), ActorRef.noSender());
             inbox.send(greeter, new Greet());
             final Greeting greeting2 = (Greeting) inbox.receive(Duration.create(5, TimeUnit.SECONDS));
             System.out.println("Greeting: " + greeting2.message);
